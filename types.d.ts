@@ -1,8 +1,8 @@
 export type City = {
-  id: number;
+  id: string;
   city: string;
   capital: string;
   country: string;
-  population: number;
+  population: string;
   countrySlug: string;
 };

@@ -29,7 +29,7 @@ async function simulatedDelay(min: number, max: number) {
 }
 
 async function getSearchResults(query: string, sort: string | null) {
-  const results = citiesResponse.data.filter((city: any) =>
+  const results = citiesResponse.data.filter((city) =>
     city.city.toLowerCase().includes(query.toLowerCase())
   );
 
