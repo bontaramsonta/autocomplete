@@ -25,6 +25,9 @@ export default function Home() {
         fetchData={fetchData}
         placeholder={"eg. Tokyo or Delhi"}
         renderListItem={({ value }) => <div>{value?.city}</div>}
+        onSelect={(value) => {
+          console.log(`Selected: ${value?.city}`);
+        }}
       />
     </main>
   );

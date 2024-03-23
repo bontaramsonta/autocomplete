@@ -6,18 +6,20 @@ const Autocomplete = (props) => {
   // defaults
   const activeClass = props.activeClass ?? "active";
   const placeholder = props.placeholder ?? "Search";
-  const [search, setSearch] = React.useState("");
-  const [searchResults, setSearchResults] = React.useState([]);
+
+  const [input, setInput] = React.useState("");
+  const [search, setSearch] = React.useState(null);
+  const [searchResults, setInputResults] = React.useState([]);
   const [activeIndex, setActiveIndex] = React.useState(-1);
 
   React.useEffect(() => {
-    if (search.length > 3) {
-      console.log(`Searching for ${search}`);
+    if (input.length > 3 && search === null) {
+      console.log(`Searching for ${input}`);
       const abortController = new AbortController();
       (async () => {
-        const results = await props.fetchData(search, abortController);
+        const results = await props.fetchData(input, abortController);
         if (Array.isArray(results)) {
-          setSearchResults(results);
+          setInputResults(results);
         }
       })();
       setActiveIndex(-1);
@@ -26,23 +28,24 @@ const Autocomplete = (props) => {
       };
     } else {
       setActiveIndex(-1);
-      setSearchResults([]);
+      setInputResults([]);
     }
-  }, [search, props]);
+  }, [input, props]);
 
   return (
     <div>
       <input
         type="text"
         placeholder={placeholder}
-        value={search}
+        value={input}
+        onClick={() => setSearch(null)}
         onChange={(e) => {
-          setSearch(e.target.value);
+          setInput(e.target.value);
         }}
         onKeyDown={(e) => {
           if (e.key === "Escape") {
             e.preventDefault();
-            setSearch("");
+            setInput("");
           } else if (e.key === "ArrowUp" || (e.key === "Tab" && e.shiftKey)) {
             e.preventDefault();
             setActiveIndex((prevIndex) => Math.max(prevIndex - 1, 0));
@@ -54,17 +57,26 @@ const Autocomplete = (props) => {
           } else if (e.key === "Enter") {
             e.preventDefault();
             if (searchResults[activeIndex]?.city) {
-              setSearch(searchResults[activeIndex]?.city);
-              setSearchResults([]);
+              setInput(searchResults[activeIndex]?.city);
+              setSearch(searchResults[activeIndex]);
+              props.onSelect(searchResults[activeIndex]);
             }
+          } else {
+            setActiveIndex(-1);
+            setSearch(null);
           }
         }}
       />
-      {searchResults.length > 0 && (
+      {!search && searchResults.length > 0 && (
         <ul>
           {searchResults.map((result, index) => (
             <li
               key={result.id}
+              onClick={() => {
+                setInput(result.city);
+                setSearch(result);
+                props.onSelect(result);
+              }}
               className={
                 (activeIndex === index ? activeClass : "") +
                 " " +
