@@ -3,7 +3,9 @@ import React from "react";
 import "./Autocomplete.css";
 
 const Autocomplete = (props) => {
+  // defaults
   const activeClass = props.activeClass ?? "active";
+  const placeholder = props.placeholder ?? "Search";
   const [search, setSearch] = React.useState("");
   const [searchResults, setSearchResults] = React.useState([]);
   const [activeIndex, setActiveIndex] = React.useState(-1);
@@ -32,7 +34,7 @@ const Autocomplete = (props) => {
     <div>
       <input
         type="text"
-        placeholder="Search"
+        placeholder={placeholder}
         value={search}
         onChange={(e) => {
           setSearch(e.target.value);
