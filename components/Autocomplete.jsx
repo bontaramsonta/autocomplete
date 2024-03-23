@@ -1,36 +1,23 @@
 "use client";
 import React from "react";
-import type { City } from "@types";
+import "./Autocomplete.css";
 
-function Autocomplete() {
+const Autocomplete = (props) => {
+  const activeClass = props.activeClass ?? "active";
   const [search, setSearch] = React.useState("");
-  const [searchResults, setSearchResults] = React.useState([] as City[]);
+  const [searchResults, setSearchResults] = React.useState([]);
   const [activeIndex, setActiveIndex] = React.useState(-1);
-
-  const callSearchApi = React.useCallback(
-    async (search: string, controller: AbortController) => {
-      try {
-        const searchCall = await fetch(`/api/search?q=${search}`, {
-          signal: controller.signal,
-        });
-        const searchResults = await searchCall.json();
-        setSearchResults(searchResults.results);
-      } catch (e) {
-        if (e instanceof Error && e?.name === "AbortError") {
-          console.log("search aborted");
-        } else {
-          console.error(e);
-        }
-      }
-    },
-    []
-  );
 
   React.useEffect(() => {
     if (search.length > 3) {
       console.log(`Searching for ${search}`);
       const abortController = new AbortController();
-      callSearchApi(search, abortController);
+      (async () => {
+        const results = await props.fetchData(search, abortController);
+        if (Array.isArray(results)) {
+          setSearchResults(results);
+        }
+      })();
       setActiveIndex(-1);
       return () => {
         abortController.abort();
@@ -39,7 +26,7 @@ function Autocomplete() {
       setActiveIndex(-1);
       setSearchResults([]);
     }
-  }, [search, callSearchApi]);
+  }, [search, props]);
 
   return (
     <div>
@@ -73,18 +60,24 @@ function Autocomplete() {
       />
       {searchResults.length > 0 && (
         <ul>
-          {searchResults.map((result: any, index: number) => (
+          {searchResults.map((result, index) => (
             <li
               key={result.id}
-              className={activeIndex === index ? "bg-gray-200" : ""}
+              className={
+                (activeIndex === index ? activeClass : "") +
+                " " +
+                (props.className ? props.className : "")
+              }
             >
-              {result.city}
+              {props.renderListItem
+                ? props.renderListItem({ value: result, index })
+                : result.city}
             </li>
           ))}
         </ul>
       )}
     </div>
   );
-}
+};
 
 export default Autocomplete;

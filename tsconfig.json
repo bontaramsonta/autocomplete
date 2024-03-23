@@ -23,6 +23,13 @@
       "@types": ["./types.d.ts"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    "app/page.jsx",
+    "components/Autocomplete.jsx"
+  ],
   "exclude": ["node_modules"]
 }
