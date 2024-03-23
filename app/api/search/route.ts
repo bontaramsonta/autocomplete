@@ -17,7 +17,7 @@ export async function GET(request: Request) {
   const results = await getSearchResults(query, sort);
 
   // delay between 200ms and 1000ms
-  await simulatedDelay(200, 800);
+  // await simulatedDelay(200, 800);
 
   return Response.json({ results });
 }
