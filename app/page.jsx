@@ -25,6 +25,8 @@ export default function Home() {
         fetchData={fetchData}
         placeholder={"eg. Tokyo or Delhi"}
         renderListItem={({ value }) => <div>{value?.city}</div>}
+        listClassName={"bg-slate-100"}
+        inputClassName={"p-2 border border-gray-300 rounded-md"}
         onSelect={(value) => {
           console.log(`Selected: ${value?.city}`);
         }}

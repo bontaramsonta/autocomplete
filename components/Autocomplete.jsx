@@ -1,11 +1,20 @@
 "use client";
 import React from "react";
 import "./Autocomplete.css";
+import { cn } from "../app/lib/utils";
 
-const Autocomplete = (props) => {
+const Autocomplete = ({
+  activeClass,
+  placeholder,
+  fetchData,
+  inputClassName,
+  listClassName,
+  onSelect,
+  renderListItem,
+}) => {
   // defaults
-  const activeClass = props.activeClass ?? "active";
-  const placeholder = props.placeholder ?? "Search";
+  activeClass = activeClass ?? "active";
+  placeholder = placeholder ?? "Search";
 
   const [input, setInput] = React.useState("");
   const [search, setSearch] = React.useState(null);
@@ -17,7 +26,7 @@ const Autocomplete = (props) => {
       console.log(`Searching for ${input}`);
       const abortController = new AbortController();
       (async () => {
-        const results = await props.fetchData(input, abortController);
+        const results = await fetchData(input, abortController);
         if (Array.isArray(results)) {
           setInputResults(results);
         }
@@ -30,7 +39,7 @@ const Autocomplete = (props) => {
       setActiveIndex(-1);
       setInputResults([]);
     }
-  }, [input, props]);
+  }, [input, fetchData]);
 
   return (
     <div>
@@ -39,6 +48,10 @@ const Autocomplete = (props) => {
         placeholder={placeholder}
         value={input}
         onClick={() => setSearch(null)}
+        className={cn(
+          inputClassName,
+          "px-2 py-1 border border-gray-300 rounded-md"
+        )}
         onChange={(e) => {
           setInput(e.target.value);
         }}
@@ -59,7 +72,7 @@ const Autocomplete = (props) => {
             if (searchResults[activeIndex]?.city) {
               setInput(searchResults[activeIndex]?.city);
               setSearch(searchResults[activeIndex]);
-              props.onSelect(searchResults[activeIndex]);
+              onSelect(searchResults[activeIndex]);
             }
           } else {
             setActiveIndex(-1);
@@ -68,23 +81,27 @@ const Autocomplete = (props) => {
         }}
       />
       {!search && searchResults.length > 0 && (
-        <ul>
+        <ul
+          className={cn(listClassName, "border-2 border-gray-100 rounded-b-md")}
+        >
           {searchResults.map((result, index) => (
             <li
               key={result.id}
               onClick={() => {
                 setInput(result.city);
                 setSearch(result);
-                props.onSelect(result);
+                onSelect(result);
               }}
-              className={
-                (activeIndex === index ? activeClass : "") +
-                " " +
-                (props.className ? props.className : "")
-              }
+              className={cn(
+                {
+                  [activeClass]: activeIndex === index,
+                },
+                listClassName,
+                "bg-white border rounded-md shadow-md p-2"
+              )}
             >
-              {props.renderListItem
-                ? props.renderListItem({ value: result, index })
+              {renderListItem
+                ? renderListItem({ value: result, index })
                 : result.city}
             </li>
           ))}
